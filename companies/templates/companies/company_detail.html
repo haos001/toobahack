@@ -1,0 +1,287 @@
+{% extends 'companies/base.html' %}
+
+{% block title %}{{ company.name }} - Tooba{% endblock %}
+
+{% block content %}
+<div class="tooba-container">
+    <!-- Back Navigation -->
+    <div class="tooba-nav-back">
+        <a href="{% url 'company_list' %}" class="nav-back-btn">
+            <i class="fas fa-chevron-left"></i>
+            <span>Назад</span>
+        </a>
+    </div>
+
+    <!-- Company Header -->
+    <div class="tooba-company-header">
+        {% if company.logo %}
+        <div class="company-avatar">
+            <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="avatar-img">
+        </div>
+        {% else %}
+        <div class="company-avatar company-avatar-placeholder">
+            <i class="fas fa-building"></i>
+        </div>
+        {% endif %}
+        
+        <div class="company-header-info">
+            <div class="company-title-row">
+                <h1 class="company-name">{{ company.name }}</h1>
+                {% if company.is_verified %}
+                <div class="verification-badge">
+                    <i class="fas fa-check"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="company-category">{{ company.category.name }}</div>
+            <div class="company-description">{{ company.description }}</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="tooba-quick-actions">
+        {% if company.phone %}
+        <a href="tel:{{ company.phone }}" class="quick-action-btn">
+            <div class="action-icon call">
+                <i class="fas fa-phone"></i>
+            </div>
+            <span>Позвонить</span>
+        </a>
+        {% endif %}
+        
+        {% if company.email %}
+        <a href="mailto:{{ company.email }}" class="quick-action-btn">
+            <div class="action-icon message">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <span>Написать</span>
+        </a>
+        {% endif %}
+        
+        {% if company.website %}
+        <a href="{{ company.website }}" target="_blank" class="quick-action-btn">
+            <div class="action-icon website">
+                <i class="fas fa-globe"></i>
+            </div>
+            <span>Сайт</span>
+        </a>
+        {% endif %}
+        
+        <button class="quick-action-btn" onclick="shareCompany()">
+            <div class="action-icon share">
+                <i class="fas fa-share-alt"></i>
+            </div>
+            <span>Поделиться</span>
+        </button>
+    </div>
+
+    <!-- Charity Impact Card -->
+    <div class="tooba-card charity-impact-card">
+        <div class="card-header">
+            <div class="header-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="header-text">
+                <h3>Благотворительная помощь</h3>
+                <p>Вклад {{ company.name }} в развитие общества</p>
+            </div>
+        </div>
+        
+        <div class="charity-impact-content">
+            <div class="impact-description">
+                {{ company.charity_description }}
+            </div>
+            
+            <div class="impact-metrics">
+                <div class="metric-item">
+                    <div class="metric-value">{{ company.charity_amount|floatformat:0 }} ₽</div>
+                    <div class="metric-label">Размер помощи</div>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric-item">
+                    <div class="metric-value">{{ company.get_charity_frequency_display }}</div>
+                    <div class="metric-label">Периодичность</div>
+                </div>
+            </div>
+            
+            <div class="tooba-badge">
+                <i class="fas fa-heart tooba-heart"></i>
+                <span>Партнер Tooba</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Info Card -->
+    <div class="tooba-card contact-card">
+        <div class="card-header">
+            <div class="header-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="header-text">
+                <h3>Контактная информация</h3>
+            </div>
+        </div>
+        
+        <div class="contact-info-list">
+            <div class="contact-info-item">
+                <div class="info-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Адрес</div>
+                    <div class="info-value">{{ company.address }}</div>
+                </div>
+                <button class="info-action" onclick="openMap()">
+                    <i class="fas fa-directions"></i>
+                </button>
+            </div>
+            
+            {% if company.phone %}
+            <div class="contact-info-item">
+                <div class="info-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Телефон</div>
+                    <div class="info-value">{{ company.phone }}</div>
+                </div>
+                <a href="tel:{{ company.phone }}" class="info-action">
+                    <i class="fas fa-phone"></i>
+                </a>
+            </div>
+            {% endif %}
+            
+            {% if company.email %}
+            <div class="contact-info-item">
+                <div class="info-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ company.email }}</div>
+                </div>
+                <a href="mailto:{{ company.email }}" class="info-action">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+            {% endif %}
+            
+            {% if company.website %}
+            <div class="contact-info-item">
+                <div class="info-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Веб-сайт</div>
+                    <div class="info-value">{{ company.website|truncatechars:30 }}</div>
+                </div>
+                <a href="{{ company.website }}" target="_blank" class="info-action">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Map Card -->
+    {% if company.latitude and company.longitude %}
+    <div class="tooba-card map-card">
+        <div class="card-header">
+            <div class="header-icon">
+                <i class="fas fa-map"></i>
+            </div>
+            <div class="header-text">
+                <h3>Местоположение</h3>
+                <p>{{ company.address }}</p>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-overlay">
+                <button class="map-fullscreen-btn" onclick="expandMap()">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Support Tooba Card -->
+    <div class="tooba-card support-card">
+        <div class="support-content">
+            <div class="support-icon">
+                <i class="fas fa-hands-helping"></i>
+            </div>
+            <div class="support-text">
+                <h3>Поддержите Tooba</h3>
+                <p>Помогите нам находить и поддерживать больше компаний-благотворителей</p>
+            </div>
+            <button class="support-btn">
+                <i class="fas fa-heart"></i>
+                <span>Поддержать</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+{% if company.latitude and company.longitude %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var map = L.map('map').setView([{{ company.latitude }}, {{ company.longitude }}], 15);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    L.marker([{{ company.latitude }}, {{ company.longitude }}])
+        .addTo(map)
+        .bindPopup('<b>{{ company.name }}</b><br>{{ company.address }}')
+        .openPopup();
+});
+
+function shareCompany() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ company.name }} - Tooba',
+            text: 'Компания-благотворитель: {{ company.name }}',
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(window.location.href);
+        // Show toast notification
+        showToast('Ссылка скопирована!');
+    }
+}
+
+function openMap() {
+    const address = encodeURIComponent('{{ company.address }}');
+    window.open(`https://yandex.ru/maps/?text=${address}`, '_blank');
+}
+
+function expandMap() {
+    // Toggle fullscreen map
+    document.getElementById('map').classList.toggle('map-fullscreen');
+}
+
+function showToast(message) {
+    // Simple toast notification
+    const toast = document.createElement('div');
+    toast.className = 'tooba-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => document.body.removeChild(toast), 300);
+    }, 3000);
+}
+</script>
+{% endif %}
+{% endblock %}

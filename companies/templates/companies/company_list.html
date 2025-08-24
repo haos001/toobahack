@@ -1,0 +1,168 @@
+{% extends 'companies/base.html' %}
+
+{% block title %}Компании-благотворители - Tooba{% endblock %}
+
+{% block content %}
+<div class="tooba-container">
+    <!-- Header -->
+    <div class="tooba-header">
+        <div class="header-content">
+            <h1 class="app-title">
+                <i class="fas fa-heart tooba-heart"></i>
+                Tooba
+            </h1>
+            <p class="app-subtitle">Компании-благотворители</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'company_apply' %}" class="apply-btn">
+                <i class="fas fa-plus"></i>
+            </a>
+            <span class="stats-badge">{{ companies|length }}</span>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="tooba-search-section">
+        <form method="get" class="search-form">
+            <div class="search-bar">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       name="search" 
+                       value="{{ request.GET.search }}" 
+                       placeholder="Поиск компаний..." 
+                       class="search-input">
+                {% if request.GET.search %}
+                <button type="button" class="search-clear" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+                {% endif %}
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <label class="filter-tab {% if not request.GET.category %}active{% endif %}">
+                    <input type="radio" name="category" value="" {% if not request.GET.category %}checked{% endif %} onchange="this.form.submit()">
+                    <span>Все</span>
+                </label>
+                {% for cat in categories %}
+                <label class="filter-tab {% if request.GET.category == cat.id|stringformat:'s' %}active{% endif %}">
+                    <input type="radio" name="category" value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}checked{% endif %} onchange="this.form.submit()">
+                    <span>{{ cat.name }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            
+            <!-- Frequency Filter -->
+            <div class="frequency-filter">
+                <select name="charity_frequency" class="frequency-select" onchange="this.form.submit()">
+                    <option value="">Любая периодичность</option>
+                    <option value="monthly" {% if request.GET.charity_frequency == 'monthly' %}selected{% endif %}>Ежемесячно</option>
+                    <option value="yearly" {% if request.GET.charity_frequency == 'yearly' %}selected{% endif %}>Ежегодно</option>
+                    <option value="weekly_friday" {% if request.GET.charity_frequency == 'weekly_friday' %}selected{% endif %}>По пятницам</option>
+                    <option value="percent_revenue" {% if request.GET.charity_frequency == 'percent_revenue' %}selected{% endif %}>Процент от выручки</option>
+                    <option value="tooba_collections" {% if request.GET.charity_frequency == 'tooba_collections' %}selected{% endif %}>На сборы в Tooba</option>
+                    <option value="once" {% if request.GET.charity_frequency == 'once' %}selected{% endif %}>Разово</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Companies List -->
+    <div class="companies-list">
+        {% for company in companies %}
+        <a href="{{ company.get_absolute_url }}" class="company-item">
+            <div class="company-avatar">
+                {% if company.logo %}
+                <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="avatar-img">
+                {% else %}
+                <div class="avatar-placeholder">
+                    <i class="fas fa-building"></i>
+                </div>
+                {% endif %}
+                {% if company.is_verified %}
+                <div class="verification-dot"></div>
+                {% endif %}
+            </div>
+            
+            <div class="company-info">
+                <div class="company-header">
+                    <h3 class="company-name">{{ company.name }}</h3>
+                    <span class="company-category">{{ company.category.name }}</span>
+                </div>
+                
+                <div class="company-description">
+                    {{ company.description|truncatewords:12 }}
+                </div>
+                
+                <div class="company-charity">
+                    <div class="charity-amount">
+                        <i class="fas fa-heart charity-icon"></i>
+                        <span>{{ company.charity_amount|floatformat:0 }} ₽</span>
+                        <span class="charity-frequency">{{ company.get_charity_frequency_display }}</span>
+                    </div>
+                </div>
+                
+                <div class="company-location">
+                    <i class="fas fa-map-marker-alt location-icon"></i>
+                    <span>{{ company.address|truncatewords:6 }}</span>
+                </div>
+            </div>
+            
+            <div class="company-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </a>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>Компании не найдены</h3>
+            <p>Попробуйте изменить параметры поиска</p>
+            <button onclick="clearAllFilters()" class="clear-filters-btn">
+                Очистить фильтры
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bottom spacing -->
+    <div class="bottom-spacing"></div>
+</div>
+
+<script>
+function clearSearch() {
+    document.querySelector('.search-input').value = '';
+    document.querySelector('.search-form').submit();
+}
+
+function clearAllFilters() {
+    const form = document.querySelector('.search-form');
+    const inputs = form.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.type === 'radio') {
+            input.checked = input.value === '';
+        } else {
+            input.value = '';
+        }
+    });
+    form.submit();
+}
+
+// Auto-submit search with debounce
+let searchTimeout;
+document.querySelector('.search-input').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        this.form.submit();
+    }, 500);
+});
+
+// Add loading state to company items
+document.querySelectorAll('.company-item').forEach(item => {
+    item.addEventListener('click', function() {
+        this.classList.add('loading');
+    });
+});
+</script>
+{% endblock %}
