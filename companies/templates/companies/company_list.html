@@ -1,144 +1,493 @@
 {% extends 'companies/base.html' %}
 
-{% block title %}Компании-благотворители - Tooba{% endblock %}
+{% block title %}Компании-благотворители - Круг добра{% endblock %}
 
 {% block content %}
-<div class="tooba-container">
-    <!-- Header -->
-    <div class="tooba-header">
-        <div class="header-content">
-            <h1 class="app-title">
-                <i class="fas fa-heart tooba-heart"></i>
-                Tooba
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+.company-card {
+    transition: all 0.3s ease;
+}
+.company-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+.animated-gradient {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.glow-effect {
+    position: relative;
+}
+.glow-effect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0.5rem;
+    padding: 1px;
+    background: linear-gradient(45deg, #f59e0b, #3b82f6, #8b5cf6);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.glow-effect:hover::before {
+    opacity: 1;
+}
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.stagger-animation {
+    animation-delay: var(--delay);
+}
+</style>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-50">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-5">
+        <div class="absolute inset-0 animated-gradient"></div>
+    </div>
+
+    <div class="relative container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12 fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                <i class="fas fa-heart text-red-500 mr-2"></i>
+                Круг добра
             </h1>
-            <p class="app-subtitle">Компании-благотворители</p>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Каждая покупка имеет значение
+            </p>
         </div>
-        <div class="header-actions">
-            <a href="{% url 'company_apply' %}" class="apply-btn">
-                <i class="fas fa-plus"></i>
-            </a>
-            <span class="stats-badge">{{ companies|length }}</span>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 fade-in stagger-animation" style="--delay: 0.1s;">
+            <div class="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-lg p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="text-3xl mb-2">🛍️</div>
+                <p class="text-2xl font-bold">150,000+</p>
+                <p class="text-sm text-gray-600">Покупок со смыслом</p>
+            </div>
+            <div class="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-lg p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="text-3xl mb-2">💰</div>
+                <p class="text-2xl font-bold">250М₽</p>
+                <p class="text-sm text-gray-600">Направлено на помощь</p>
+            </div>
+            <div class="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-lg p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="text-3xl mb-2">❤️</div>
+                <p class="text-2xl font-bold">12,500</p>
+                <p class="text-sm text-gray-600">Людей получили помощь</p>
+            </div>
+            <div class="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-lg p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="text-3xl mb-2">🏪</div>
+                <p class="text-2xl font-bold">12+</p>
+                <p class="text-sm text-gray-600">Добрых брендов</p>
+            </div>
         </div>
-    </div>
 
-    <!-- Search Bar -->
-    <div class="tooba-search-section">
-        <form method="get" class="search-form">
-            <div class="search-bar">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request.GET.search }}" 
-                       placeholder="Поиск компаний..." 
-                       class="search-input">
-                {% if request.GET.search %}
-                <button type="button" class="search-clear" onclick="clearSearch()">
-                    <i class="fas fa-times"></i>
-                </button>
-                {% endif %}
-            </div>
-            
-            <!-- Filter Tabs -->
-            <div class="filter-tabs">
-                <label class="filter-tab {% if not request.GET.category %}active{% endif %}">
-                    <input type="radio" name="category" value="" {% if not request.GET.category %}checked{% endif %} onchange="this.form.submit()">
-                    <span>Все</span>
-                </label>
-                {% for cat in categories %}
-                <label class="filter-tab {% if request.GET.category == cat.id|stringformat:'s' %}active{% endif %}">
-                    <input type="radio" name="category" value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}checked{% endif %} onchange="this.form.submit()">
-                    <span>{{ cat.name }}</span>
-                </label>
-                {% endfor %}
-            </div>
-            
-            <!-- Frequency Filter -->
-            <div class="frequency-filter">
-                <select name="charity_frequency" class="frequency-select" onchange="this.form.submit()">
-                    <option value="">Любая периодичность</option>
-                    <option value="monthly" {% if request.GET.charity_frequency == 'monthly' %}selected{% endif %}>Ежемесячно</option>
-                    <option value="yearly" {% if request.GET.charity_frequency == 'yearly' %}selected{% endif %}>Ежегодно</option>
-                    <option value="weekly_friday" {% if request.GET.charity_frequency == 'weekly_friday' %}selected{% endif %}>По пятницам</option>
-                    <option value="percent_revenue" {% if request.GET.charity_frequency == 'percent_revenue' %}selected{% endif %}>Процент от выручки</option>
-                    <option value="tooba_collections" {% if request.GET.charity_frequency == 'tooba_collections' %}selected{% endif %}>На сборы в Tooba</option>
-                    <option value="once" {% if request.GET.charity_frequency == 'once' %}selected{% endif %}>Разово</option>
-                </select>
-            </div>
-        </form>
-    </div>
-
-    <!-- Companies List -->
-    <div class="companies-list">
-        {% for company in companies %}
-        <a href="{{ company.get_absolute_url }}" class="company-item">
-            <div class="company-avatar">
-                {% if company.logo %}
-                <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="avatar-img">
-                {% else %}
-                <div class="avatar-placeholder">
-                    <i class="fas fa-building"></i>
-                </div>
-                {% endif %}
-                {% if company.is_verified %}
-                <div class="verification-dot"></div>
-                {% endif %}
-            </div>
-            
-            <div class="company-info">
-                <div class="company-header">
-                    <h3 class="company-name">{{ company.name }}</h3>
-                    <span class="company-category">{{ company.category.name }}</span>
-                </div>
-                
-                <div class="company-description">
-                    {{ company.description|truncatewords:12 }}
-                </div>
-                
-                <div class="company-charity">
-                    <div class="charity-amount">
-                        <i class="fas fa-heart charity-icon"></i>
-                        <span>{{ company.charity_amount|floatformat:0 }} ₽</span>
-                        <span class="charity-frequency">{{ company.get_charity_frequency_display }}</span>
+        <!-- Search and Filters -->
+        <div class="space-y-6 mb-8 fade-in stagger-animation" style="--delay: 0.2s;">
+            <!-- Enhanced Search -->
+            <form method="get" class="search-form">
+                <div class="relative group glow-effect">
+                    <div class="relative flex items-center bg-white/50 backdrop-blur-sm rounded-lg border border-gray-200/50 focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/20">
+                        <i class="fas fa-search absolute left-3 text-gray-400 text-lg"></i>
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request.GET.search }}" 
+                               placeholder="Поиск компаний-благотворителей..." 
+                               class="w-full pl-10 pr-4 py-4 text-base bg-transparent border-none outline-none placeholder-gray-500">
+                        {% if request.GET.search %}
+                        <button type="button" class="absolute right-3 p-2 text-gray-400 hover:text-gray-600 transition-colors" onclick="clearSearch()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="absolute top-full left-0 right-0 mt-2 p-3 bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-lg shadow-lg z-10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-200">
+                        <p class="text-sm text-gray-600">
+                            Поиск по названию, описанию, категории или местоположению
+                        </p>
                     </div>
                 </div>
-                
-                <div class="company-location">
-                    <i class="fas fa-map-marker-alt location-icon"></i>
-                    <span>{{ company.address|truncatewords:6 }}</span>
-                </div>
-            </div>
             
-            <div class="company-arrow">
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </a>
-        {% empty %}
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="fas fa-search"></i>
-            </div>
-            <h3>Компании не найдены</h3>
-            <p>Попробуйте изменить параметры поиска</p>
-            <button onclick="clearAllFilters()" class="clear-filters-btn">
-                Очистить фильтры
-            </button>
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-filter text-blue-600"></i>
+                        <span class="font-medium text-gray-700">Фильтры:</span>
+                    </div>
+                    
+                    <!-- Category Tabs -->
+                    <div class="flex flex-wrap gap-2">
+                        <label class="px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 {% if not request.GET.category %}bg-blue-600 text-white{% else %}bg-white/50 text-gray-700 hover:bg-gray-100{% endif %}">
+                            <input type="radio" name="category" value="" {% if not request.GET.category %}checked{% endif %} onchange="this.form.submit()" class="hidden">
+                            <span>Все</span>
+                        </label>
+                        {% for cat in categories %}
+                        <label class="px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 {% if request.GET.category == cat.id|stringformat:'s' %}bg-blue-600 text-white{% else %}bg-white/50 text-gray-700 hover:bg-gray-100{% endif %}">
+                            <input type="radio" name="category" value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}checked{% endif %} onchange="this.form.submit()" class="hidden">
+                            <span>{{ cat.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            
+                <!-- Frequency Filter -->
+                <div class="flex flex-wrap gap-4 items-center">
+                    <select name="charity_frequency" class="px-4 py-2 bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none" onchange="this.form.submit()">
+                        <option value="">Любая периодичность</option>
+                        <option value="monthly" {% if request.GET.charity_frequency == 'monthly' %}selected{% endif %}>Ежемесячно</option>
+                        <option value="yearly" {% if request.GET.charity_frequency == 'yearly' %}selected{% endif %}>Ежегодно</option>
+                        <option value="weekly_friday" {% if request.GET.charity_frequency == 'weekly_friday' %}selected{% endif %}>По пятницам</option>
+                        <option value="percent_revenue" {% if request.GET.charity_frequency == 'percent_revenue' %}selected{% endif %}>Процент от выручки</option>
+                        <option value="tooba_collections" {% if request.GET.charity_frequency == 'tooba_collections' %}selected{% endif %}>На сборы в Круг добра</option>
+                        <option value="once" {% if request.GET.charity_frequency == 'once' %}selected{% endif %}>Разово</option>
+                    </select>
+                    
+                    <button type="button" onclick="clearAllFilters()" class="px-4 py-2 bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                        Сбросить
+                    </button>
+                </div>
+            </form>
         </div>
-        {% endfor %}
-    </div>
 
-    <!-- Bottom spacing -->
-    <div class="bottom-spacing"></div>
+        <!-- Results Info -->
+        <div class="flex items-center justify-between mb-6 fade-in stagger-animation" style="--delay: 0.3s;">
+            <p class="text-gray-600">
+                Найдено {{ companies|length }} благотворительных компаний
+                {% if request.GET.search %}по запросу "{{ request.GET.search }}"{% endif %}
+            </p>
+            <div class="flex items-center gap-2">
+                <a href="{% url 'company_apply' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    Подать заявку
+                </a>
+            </div>
+        </div>
+
+        <!-- Companies Grid -->
+        {% if companies %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for company in companies %}
+                <div class="company-card bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/50 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 fade-in stagger-animation" style="--delay: 0.{{ forloop.counter0|add:3 }}s;">
+                    <a href="{{ company.get_absolute_url }}" class="block group">
+                        <!-- Company Image/Avatar -->
+                        <div class="relative overflow-hidden h-48">
+                            {% if company.logo %}
+                            <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                            {% else %}
+                            <div class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                                <i class="fas fa-building text-4xl text-white"></i>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/70 transition-all duration-300"></div>
+                            
+                            <!-- Verification Badge -->
+                            {% if company.is_verified %}
+                            <div class="absolute top-4 right-4 bg-green-500 p-2 rounded-full border-2 border-white" title="Верифицированная компания">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Category Badge -->
+                            <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-white text-sm">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <span class="font-medium">4.7</span>
+                                </div>
+                                <span class="px-3 py-1 bg-white/80 backdrop-blur-sm text-gray-800 text-xs font-medium rounded-full">
+                                    {{ company.category.name }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="p-6">
+                            <!-- Header -->
+                            <div class="flex items-start justify-between mb-3">
+                                <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                                    {{ company.name }}
+                                </h3>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                                    {{ company.get_charity_frequency_display }}
+                                </span>
+                            </div>
+                            
+                            <!-- Location & Founded -->
+                            <div class="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-map-marker-alt text-gray-400"></i>
+                                    <span>{{ company.address }}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-calendar text-gray-400"></i>
+                                    <span>2020</span>
+                                </div>
+                            </div>
+
+                            <!-- Charity Action -->
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                                <div class="flex items-start gap-2">
+                                    <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-heart text-white text-xs"></i>
+                                    </div>
+                                    <p class="text-sm text-green-800 font-medium leading-relaxed">
+                                        {{ company.charity_description|truncatewords:20 }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Stats Grid -->
+                            <div class="flex justify-center mb-4">
+                                <div class="space-y-1 text-center">
+                                    <div class="flex items-center justify-center gap-2 text-gray-500">
+                                        <i class="fas fa-heart text-red-500"></i>
+                                        <span>Пожертвовано:</span>
+                                    </div>
+                                    <p class="font-bold text-green-600 text-lg">{{ company.charity_amount|floatformat:0 }} ₽</p>
+                                </div>
+                            </div>
+
+                            <!-- Projects -->
+                            <div class="space-y-2 mb-4">
+                                <h4 class="text-sm font-medium flex items-center gap-2">
+                                    <i class="fas fa-award text-blue-500"></i>
+                                    Недавние проекты:
+                                </h4>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Образование</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Экология</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">+3</span>
+                                </div>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-1 mb-4">
+                                <span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">Инновации</span>
+                                <span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">Партнер Круг добра</span>
+                            </div>
+
+                            <!-- Action Buttons (visible on hover) -->
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <button class="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-globe mr-2"></i>
+                                    Сайт
+                                </button>
+                                <button class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-envelope mr-2"></i>
+                                    Контакт
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Arrow indicator -->
+                        <div class="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-16 fade-in">
+                <div class="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-search text-2xl text-gray-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Компании не найдены</h3>
+                <p class="text-gray-600 mb-4">Попробуйте изменить параметры поиска или фильтры</p>
+                <button onclick="clearAllFilters()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Сбросить фильтры
+                </button>
+            </div>
+        {% endif %}
+    
+        <!-- Pagination -->
+        {% if companies.has_other_pages %}
+        <div class="mt-12 fade-in">
+            <div class="flex items-center justify-center">
+                <nav class="flex items-center space-x-2">
+                    {% if companies.has_previous %}
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.charity_frequency %}charity_frequency={{ request.GET.charity_frequency }}&{% endif %}page={{ companies.previous_page_number }}" class="px-3 py-2 text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-chevron-left mr-2"></i>
+                        Назад
+                    </a>
+                    {% endif %}
+                    
+                    {% for num in companies.paginator.page_range %}
+                        {% if companies.number == num %}
+                            <span class="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center text-sm font-medium">{{ num }}</span>
+                        {% else %}
+                            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.charity_frequency %}charity_frequency={{ request.GET.charity_frequency }}&{% endif %}page={{ num }}" class="w-10 h-10 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg flex items-center justify-center text-sm transition-colors">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if companies.has_next %}
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.charity_frequency %}charity_frequency={{ request.GET.charity_frequency }}&{% endif %}page={{ companies.next_page_number }}" class="px-3 py-2 text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                        Вперед
+                        <i class="fas fa-chevron-right ml-2"></i>
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Bottom spacing -->
+        <div class="h-16"></div>
+    </div>
 </div>
 
 <script>
+// Enhanced JavaScript with animations and interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize animations
+    initializeAnimations();
+    
+    // Enhanced search functionality
+    setupEnhancedSearch();
+    
+    // Company card interactions
+    setupCompanyCardInteractions();
+    
+    // Loading states
+    setupLoadingStates();
+});
+
+function initializeAnimations() {
+    // Trigger fade-in animations
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach((element, index) => {
+        element.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // Parallax effect for background
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.animated-gradient');
+        if (parallax) {
+            parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+        }
+    });
+}
+
+function setupEnhancedSearch() {
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            
+            // Show loading indicator
+            this.classList.add('searching');
+            
+            searchTimeout = setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        });
+        
+        // Enhanced focus effects
+        searchInput.addEventListener('focus', function() {
+            this.closest('.glow-effect').classList.add('focused');
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            this.closest('.glow-effect').classList.remove('focused');
+        });
+    }
+}
+
+function setupCompanyCardInteractions() {
+    const companyCards = document.querySelectorAll('.company-card');
+    
+    companyCards.forEach((card, index) => {
+        // Stagger animation delay - delay уже установлен в HTML
+        if (!card.style.getPropertyValue('--delay')) {
+            card.style.setProperty('--delay', `${index * 0.1}s`);
+        }
+        
+        // Enhanced hover effects
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.boxShadow = '0 20px 40px rgba(59, 130, 246, 0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '';
+        });
+        
+        // Add click ripple effect
+        card.addEventListener('click', function(e) {
+            const ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+function setupLoadingStates() {
+    const form = document.querySelector('.search-form');
+    const companyGrid = document.querySelector('.grid');
+    
+    if (form) {
+        form.addEventListener('submit', function() {
+            if (companyGrid) {
+                companyGrid.style.opacity = '0.5';
+                companyGrid.style.pointerEvents = 'none';
+                
+                // Add loading spinner
+                const loader = document.createElement('div');
+                loader.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50';
+                loader.innerHTML = '<div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>';
+                document.body.appendChild(loader);
+            }
+        });
+    }
+}
+
 function clearSearch() {
-    document.querySelector('.search-input').value = '';
-    document.querySelector('.search-form').submit();
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.form.submit();
+    }
 }
 
 function clearAllFilters() {
     const form = document.querySelector('.search-form');
     const inputs = form.querySelectorAll('input, select');
+    
     inputs.forEach(input => {
         if (input.type === 'radio') {
             input.checked = input.value === '';
@@ -146,23 +495,54 @@ function clearAllFilters() {
             input.value = '';
         }
     });
+    
     form.submit();
 }
 
-// Auto-submit search with debounce
-let searchTimeout;
-document.querySelector('.search-input').addEventListener('input', function() {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        this.form.submit();
-    }, 500);
-});
-
-// Add loading state to company items
-document.querySelectorAll('.company-item').forEach(item => {
-    item.addEventListener('click', function() {
-        this.classList.add('loading');
-    });
-});
+// Add ripple effect CSS
+const rippleStyle = document.createElement('style');
+rippleStyle.textContent = `
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(59, 130, 246, 0.3);
+        transform: scale(0);
+        animation: ripple-animation 0.6s linear;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+    
+    .searching {
+        background-image: linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.1) 50%, transparent 70%);
+        background-size: 200% 100%;
+        animation: searching-animation 1.5s infinite;
+    }
+    
+    @keyframes searching-animation {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    
+    .line-clamp-1 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+    
+    .line-clamp-3 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+`;
+document.head.appendChild(rippleStyle);
 </script>
 {% endblock %}

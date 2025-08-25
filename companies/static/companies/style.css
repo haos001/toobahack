@@ -1,18 +1,23 @@
-/* Tooba Charity Showcase Styles */
+/* Круг добра - Charity Showcase Styles */
 :root {
-    --primary-color: #007bff;
-    --success-color: #28a745;
-    --info-color: #17a2b8;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --light-color: #f8f9fa;
-    --dark-color: #343a40;
+    --tooba-blue: #3B82F6;
+    --tooba-blue-light: #60A5FA;
+    --tooba-blue-dark: #2563EB;
+    --tooba-green: #10B981;
+    --tooba-gray: #6B7280;
+    --tooba-gray-light: #F9FAFB;
+    --tooba-gray-dark: #374151;
+    --tooba-white: #FFFFFF;
+    --tooba-black: #111827;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
-    color: #333;
+    color: var(--tooba-black);
+    background: var(--tooba-gray-light);
+    margin: 0;
+    padding: 0;
 }
 
 .navbar-brand {
@@ -94,6 +99,354 @@ body {
 .form-label {
     font-weight: 500;
     color: var(--dark-color);
+}
+
+/* Круг добра Landing Styles */
+.tooba-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    background: var(--tooba-white);
+    min-height: 100vh;
+}
+
+.tooba-header {
+    padding: 40px 20px;
+    background: linear-gradient(135deg, var(--tooba-blue) 0%, var(--tooba-blue-light) 100%);
+    color: var(--tooba-white);
+    text-align: center;
+    margin: 0 0 32px 0;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.15);
+}
+
+.tooba-logo {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.app-subtitle {
+    font-size: 1.2rem;
+    margin: 8px 0 24px 0;
+    opacity: 0.9;
+}
+
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 24px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.tooba-btn-primary {
+    background: var(--tooba-white);
+    color: var(--tooba-blue);
+    padding: 12px 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+
+.tooba-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    color: var(--tooba-blue-dark);
+}
+
+.tooba-search-section {
+    margin: 0 20px 32px 20px;
+}
+
+.search-bar {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 48px 16px 20px;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: var(--tooba-white);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.search-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--tooba-gray);
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding: 4px 0;
+}
+
+.filter-tab {
+    background: var(--tooba-white);
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-tab.active {
+    background: var(--tooba-blue);
+    color: var(--tooba-white);
+    border-color: var(--tooba-blue);
+}
+
+.filter-tab input {
+    display: none;
+}
+
+.companies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 20px;
+}
+
+.company-item {
+    background: var(--tooba-white);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s ease;
+}
+
+.company-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+    text-decoration: none;
+    color: inherit;
+    border-color: var(--tooba-blue-light);
+}
+
+.company-avatar {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.avatar-img, .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    background: var(--tooba-gray-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tooba-gray);
+}
+
+.verification-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    background: var(--tooba-green);
+    border: 2px solid var(--tooba-white);
+    border-radius: 50%;
+}
+
+.company-info {
+    flex: 1;
+}
+
+.company-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.company-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--tooba-black);
+}
+
+.company-category {
+    background: var(--tooba-blue);
+    color: var(--tooba-white);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.company-description {
+    color: var(--tooba-gray);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.charity-amount {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--tooba-green);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.charity-icon {
+    color: var(--tooba-green);
+}
+
+.charity-frequency {
+    color: var(--tooba-gray);
+    font-weight: 400;
+}
+
+.company-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--tooba-gray);
+    font-size: 0.8rem;
+}
+
+.location-icon {
+    color: var(--tooba-gray);
+}
+
+.company-arrow {
+    color: var(--tooba-gray);
+    margin-left: 16px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 64px 16px;
+    color: var(--tooba-gray);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.clear-filters-btn {
+    background: var(--tooba-blue);
+    color: var(--tooba-white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-top: 16px;
+    cursor: pointer;
+}
+
+/* Pagination */
+.pagination {
+    justify-content: center;
+    margin: 40px 20px;
+}
+
+.page-link {
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    color: var(--tooba-blue);
+    margin: 0 2px;
+}
+
+.page-link:hover {
+    background: var(--tooba-blue);
+    border-color: var(--tooba-blue);
+    color: var(--tooba-white);
+}
+
+.page-item.active .page-link {
+    background: var(--tooba-blue);
+    border-color: var(--tooba-blue);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-stats {
+        gap: 16px;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .company-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .tooba-header {
+        padding: 30px 16px;
+    }
+    
+    .tooba-search-section {
+        margin: 0 16px 24px 16px;
+    }
+    
+    .companies-list {
+        padding: 0 16px;
+    }
+    
+    .pagination {
+        margin: 32px 16px;
+    }
+    
+    .company-item {
+        padding: 16px;
+    }
+    
+    .company-avatar {
+        width: 48px;
+        height: 48px;
+        margin-right: 16px;
+    }
 }
 
 /* Badges */
@@ -543,7 +896,7 @@ footer {
     animation-delay: 0.4s;
 }
 
-/* Tooba App Style - Company Detail Page */
+/* Круг добра App Style - Company Detail Page */
 .tooba-container {
     max-width: 400px;
     margin: 0 auto;
@@ -724,7 +1077,7 @@ footer {
     background: linear-gradient(135deg, #8e8e93, #636366);
 }
 
-/* Tooba Cards */
+/* Круг добра Cards */
 .tooba-card {
     background: white;
     border-radius: 20px;
@@ -1078,7 +1431,7 @@ footer {
     }
 }
 
-/* Tooba Main Page Styles */
+/* Круг добра Main Page Styles */
 .tooba-header {
     background: linear-gradient(135deg, #FF3B30 0%, #FF6B35 50%, #FF9500 100%);
     color: white;

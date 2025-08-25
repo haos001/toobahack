@@ -31,7 +31,7 @@ class Company(models.Model):
         ('yearly', 'Ежегодно'),
         ('weekly_friday', 'По пятницам'),
         ('percent_revenue', 'Процент от выручки'),
-        ('tooba_collections', 'На сборы в Tooba'),
+        ('tooba_collections', 'На сборы в Круг добра'),
         ('once', 'Разово'),
     ], verbose_name="Периодичность")
     
@@ -83,7 +83,7 @@ class CompanyApplication(models.Model):
         ('yearly', 'Ежегодно'),
         ('weekly_friday', 'По пятницам'),
         ('percent_revenue', 'Процент от выручки'),
-        ('tooba_collections', 'На сборы в Tooba'),
+        ('tooba_collections', 'На сборы в Круг добра'),
         ('once', 'Разово'),
     ], verbose_name="Периодичность")
     
